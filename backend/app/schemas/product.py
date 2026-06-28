@@ -1,23 +1,30 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
+from app.schemas.review import ReviewOut
+
+
+class ProductListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    description: str | None
+    image_url: str | None
+    average_rating: float
+    review_count: int
+
+
+class ProductDetail(ProductListItem):
+    reviews: list[ReviewOut]
 
 
 class ProductCreate(BaseModel):
-    name: str
-    description: str = ""
-    image_url: str | None = None
-
-
-class ProductUpdate(BaseModel):
-    name: str | None = None
+    title: str
     description: str | None = None
     image_url: str | None = None
 
 
-class ProductOut(BaseModel):
-    id: int
-    name: str
-    description: str
-    image_url: str | None
-    average_rating: float | None = None
-
-    model_config = {"from_attributes": True}
+class ProductUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    image_url: str | None = None

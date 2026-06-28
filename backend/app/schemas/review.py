@@ -1,19 +1,24 @@
-from pydantic import BaseModel, Field
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class ReviewOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user: str
+    rating: int
+    comment: str | None
+    created_at: datetime
 
 
 class ReviewCreate(BaseModel):
     product_id: int
     rating: int = Field(ge=1, le=5)
-    title: str = ""
-    body: str = ""
+    comment: str | None = None
 
 
-class ReviewOut(BaseModel):
-    id: int
-    product_id: int
-    user_id: int
-    rating: int
-    title: str
-    body: str
-
-    model_config = {"from_attributes": True}
+class ReviewUpdate(BaseModel):
+    rating: int | None = Field(default=None, ge=1, le=5)
+    comment: str | None = None
