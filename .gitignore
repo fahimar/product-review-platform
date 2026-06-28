@@ -17,9 +17,11 @@ node_modules/
 .next/
 *.tsbuildinfo
 
-# Env files (keep examples)
+# Env files (none committed — copy .env.example locally)
+.env
 .env.local
 .env.*.local
+.env.example
 
 # Docs & markdown (internal planning only)
 docs/
