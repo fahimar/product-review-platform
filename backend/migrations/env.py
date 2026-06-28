@@ -9,6 +9,12 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.core.config import settings
 from app.db.base import Base
 
+# Must import every model so their tables land in Base.metadata before
+# autogenerate reads it — without these lines Alembic sees an empty schema.
+import app.models.user    # noqa: F401, E402
+import app.models.product  # noqa: F401, E402
+import app.models.review   # noqa: F401, E402
+
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
