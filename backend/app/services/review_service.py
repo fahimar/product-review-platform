@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError, ForbiddenError, NotFoundError
 from app.models.review import Review
+from app.models.user import User
 from app.repositories import product_repo, review_repo
 from app.schemas.review import ReviewCreate, ReviewOut, ReviewUpdate
 
@@ -16,6 +17,11 @@ async def create_review(db: AsyncSession, data: ReviewCreate, user_id: int) -> R
     product = await product_repo.get_by_id(db, data.product_id)
     if not product:
         raise NotFoundError(f"Product {data.product_id} not found")
+
+    user = await db.get(User, user_id)
+    if not user:
+        raise NotFoundError(f"User {user_id} not found")
+
     try:
         review = await review_repo.create(db, data, user_id)
     except IntegrityError:

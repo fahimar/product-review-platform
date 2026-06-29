@@ -25,11 +25,29 @@ class ReviewOut(BaseModel):
 
 
 class ReviewCreate(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "product_id": 1,
+                "user_id": 2,
+                "rating": 5,
+                "comment": "Very good",
+            }
+        }
+    )
+
     product_id: int
+    user_id: int
     rating: int = Field(ge=1, le=5)
-    comment: str | None = None
+    comment: str | None = Field(default=None, max_length=1000)
 
 
 class ReviewUpdate(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {"rating": 4, "comment": "Updated opinion after a week"}
+        }
+    )
+
     rating: int | None = Field(default=None, ge=1, le=5)
-    comment: str | None = None
+    comment: str | None = Field(default=None, max_length=1000)
