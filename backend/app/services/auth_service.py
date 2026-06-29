@@ -5,10 +5,10 @@ from app.core.exceptions import ConflictError, NotFoundError
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
 from app.schemas.auth import Token
-from app.schemas.user import UserCreate, UserOut
+from app.schemas.user import UserCreate
 
 
-async def register(db: AsyncSession, data: UserCreate) -> UserOut:
+async def register(db: AsyncSession, data: UserCreate) -> Token:
     existing = await db.execute(select(User).where(User.email == data.email))
     if existing.scalar_one_or_none():
         raise ConflictError("Email already registered")
@@ -20,7 +20,7 @@ async def register(db: AsyncSession, data: UserCreate) -> UserOut:
     db.add(user)
     await db.commit()
     await db.refresh(user)
-    return UserOut.model_validate(user)
+    return Token(access_token=create_access_token(str(user.id)))
 
 
 async def login(db: AsyncSession, email: str, password: str) -> Token:
@@ -28,5 +28,4 @@ async def login(db: AsyncSession, email: str, password: str) -> Token:
     user = result.scalar_one_or_none()
     if not user or not verify_password(password, user.password_hash):
         raise NotFoundError("Invalid credentials")
-    token = create_access_token(str(user.id))
-    return Token(access_token=token)
+    return Token(access_token=create_access_token(str(user.id)))
