@@ -4,7 +4,18 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ReviewOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 9,
+                "user": "John",
+                "rating": 5,
+                "comment": "Excellent product",
+                "created_at": "2024-01-15T10:30:00Z",
+            }
+        },
+    )
 
     id: int
     user: str

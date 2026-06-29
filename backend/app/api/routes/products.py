@@ -8,6 +8,8 @@ from app.services import product_service
 
 router = APIRouter()
 
+_404 = {404: {"description": "Not found", "content": {"application/json": {"example": {"detail": "Product 1 not found"}}}}}
+
 
 @router.get("/", response_model=list[ProductListItem])
 async def list_products(
@@ -18,7 +20,7 @@ async def list_products(
     return await product_service.list_products(db, search, min_rating)
 
 
-@router.get("/{product_id}", response_model=ProductDetail)
+@router.get("/{product_id}", response_model=ProductDetail, responses=_404)
 async def get_product(product_id: int, db: AsyncSession = Depends(get_db)) -> ProductDetail:
     return await product_service.get_product(db, product_id)
 
