@@ -1,4 +1,4 @@
-from sqlalchemy import Float, func, select
+from sqlalchemy import Float, Numeric, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -13,8 +13,13 @@ async def list_with_aggregates(
     min_rating: float | None = None,
 ) -> list:
     """Single LEFT JOIN query — no N+1. Returns raw rows with aggregate columns."""
+    # round(numeric, int) — cast to NUMERIC first for portability across PG versions
     avg_expr = func.round(
-        func.coalesce(func.avg(func.cast(Review.rating, Float)), 0.0), 1
+        func.cast(
+            func.coalesce(func.avg(func.cast(Review.rating, Float)), 0.0),
+            Numeric(10, 2),
+        ),
+        1,
     ).label("average_rating")
     count_expr = func.count(Review.id).label("review_count")
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_optional_user
@@ -30,6 +30,11 @@ async def create_review(
 ) -> ReviewOut:
     # JWT takes precedence over body user_id (supports both auth and no-auth flows)
     effective_user_id = current_user.id if current_user else data.user_id
+    if effective_user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sign in to post a review",
+        )
     return await review_service.create_review(db, data, effective_user_id)
 
 

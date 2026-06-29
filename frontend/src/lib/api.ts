@@ -29,11 +29,13 @@ export function getProducts(search?: string, minRating?: number): Promise<Produc
   if (search) params.set("search", search);
   if (minRating !== undefined) params.set("min_rating", String(minRating));
   const qs = params.toString();
-  return request<Product[]>(`/api/products${qs ? `?${qs}` : ""}`);
+  return request<Product[]>(`/api/products${qs ? `?${qs}` : ""}`, {
+    next: { revalidate: 0 },
+  });
 }
 
 export function getProduct(id: number): Promise<ProductDetail> {
-  return request<ProductDetail>(`/api/products/${id}`);
+  return request<ProductDetail>(`/api/products/${id}`, { next: { revalidate: 0 } });
 }
 
 // ── Reviews ──────────────────────────────────────────────────────────────────
@@ -67,15 +69,20 @@ export function deleteReview(id: number, token?: string): Promise<void> {
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
+// Backend uses OAuth2PasswordRequestForm — requires application/x-www-form-urlencoded
+// with fields "username" (treated as email) and "password".
 export function login(email: string, password: string): Promise<TokenOut> {
+  const body = new URLSearchParams({ username: email, password });
   return request<TokenOut>("/api/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
   });
 }
 
-export function register(name: string, email: string, password: string): Promise<UserOut> {
-  return request<UserOut>("/api/auth/register", {
+// /register returns Token (access_token + token_type), not the UserOut object.
+export function register(name: string, email: string, password: string): Promise<TokenOut> {
+  return request<TokenOut>("/api/auth/register", {
     method: "POST",
     body: JSON.stringify({ name, email, password }),
   });

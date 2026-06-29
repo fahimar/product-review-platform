@@ -25,7 +25,9 @@ node_modules/
 
 # Docs & markdown (internal planning only)
 docs/
+plan.md
 *.md
+!README.md
 
 # OS
 .DS_Store

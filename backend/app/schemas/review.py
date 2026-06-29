@@ -37,7 +37,7 @@ class ReviewCreate(BaseModel):
     )
 
     product_id: int
-    user_id: int
+    user_id: int | None = None  # ignored when JWT token is present; required otherwise
     rating: int = Field(ge=1, le=5)
     comment: str | None = Field(default=None, max_length=1000)
 
