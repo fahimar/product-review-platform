@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Star } from "lucide-react";
 import { createReview } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -26,22 +26,29 @@ function StarPicker({
   return (
     <div className="space-y-1">
       <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            disabled={disabled}
-            onClick={() => onChange(star)}
-            onMouseEnter={() => setHover(star)}
-            onMouseLeave={() => setHover(0)}
-            aria-label={`${star} star${star !== 1 ? "s" : ""}`}
-            className="text-3xl leading-none focus:outline-none disabled:cursor-not-allowed transition-transform hover:scale-110"
-          >
-            <span className={(hover || value) >= star ? "text-yellow-400" : "text-gray-300"}>
-              ★
-            </span>
-          </button>
-        ))}
+        {[1, 2, 3, 4, 5].map((star) => {
+          const active = (hover || value) >= star;
+          return (
+            <button
+              key={star}
+              type="button"
+              disabled={disabled}
+              onClick={() => onChange(star)}
+              onMouseEnter={() => setHover(star)}
+              onMouseLeave={() => setHover(0)}
+              aria-label={`${star} star${star !== 1 ? "s" : ""}`}
+              className="focus:outline-none disabled:cursor-not-allowed transition-transform hover:scale-110"
+            >
+              <Star
+                className={`h-7 w-7 transition-colors ${
+                  active
+                    ? "fill-yellow-400 stroke-yellow-400"
+                    : "fill-none stroke-gray-300"
+                }`}
+              />
+            </button>
+          );
+        })}
       </div>
       <p className="text-xs text-muted-foreground h-4">
         {(hover || value) > 0 ? labels[(hover || value) - 1] : ""}
