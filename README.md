@@ -4,6 +4,8 @@ A full-stack product review platform — browse products, read reviews, and subm
 
 **Stack:** FastAPI (async) · SQLAlchemy 2.0 · Alembic · PostgreSQL 16 · Next.js 15 (App Router) · TypeScript · Tailwind CSS · shadcn/ui
 
+![ReviewDibo product page](docs/screenshots/app-preview.png)
+
 ---
 
 ## Live links
