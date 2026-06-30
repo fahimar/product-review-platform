@@ -1,4 +1,5 @@
 import json
+import re
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -11,6 +12,11 @@ class Settings(BaseSettings):
     JWT_EXPIRE_MINUTES: int = 30
     ALGORITHM: str = "HS256"  # internal — callers use JWT_SECRET/JWT_EXPIRE_MINUTES
     CORS_ORIGINS: str = "http://localhost:3000"
+
+    @property
+    def asyncpg_url(self) -> str:
+        # asyncpg uses ssl=true, not sslmode=require (libpq syntax)
+        return re.sub(r"sslmode=\w+", "ssl=true", self.DATABASE_URL)
 
     @property
     def cors_origins_list(self) -> list[str]:
