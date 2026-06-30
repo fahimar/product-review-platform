@@ -18,12 +18,19 @@ const BASE =
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...init?.headers },
     ...init,
+    headers: { "Content-Type": "application/json", ...init?.headers },
   });
   if (!res.ok) {
-    const detail = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error((detail as { detail?: string }).detail ?? res.statusText);
+    const body = await res.json().catch(() => null);
+    const detail = body?.detail;
+    const message =
+      typeof detail === "string"
+        ? detail
+        : Array.isArray(detail)
+          ? detail.map((e: { msg?: string }) => e.msg ?? "Validation error").join(", ")
+          : res.statusText;
+    throw new Error(message);
   }
   return res.json() as Promise<T>;
 }
