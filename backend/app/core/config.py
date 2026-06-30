@@ -15,8 +15,14 @@ class Settings(BaseSettings):
 
     @property
     def asyncpg_url(self) -> str:
-        # asyncpg uses ssl=true, not sslmode=require (libpq syntax)
-        return re.sub(r"sslmode=\w+", "ssl=true", self.DATABASE_URL)
+        # Strip sslmode/ssl from URL — passed via connect_args as Python bool instead
+        url = re.sub(r"[?&]sslmode=\w+", "", self.DATABASE_URL)
+        url = re.sub(r"[?&]ssl=\w+", "", url)
+        return url.rstrip("?").rstrip("&")
+
+    @property
+    def asyncpg_ssl(self) -> bool:
+        return "sslmode=require" in self.DATABASE_URL or "ssl=" in self.DATABASE_URL
 
     @property
     def cors_origins_list(self) -> list[str]:
