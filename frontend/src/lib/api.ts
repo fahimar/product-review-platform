@@ -8,7 +8,13 @@ import type {
   UserOut,
 } from "./types";
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+// Server Components (SSR) use API_BASE_URL — routed inside the Docker network
+// (e.g. http://backend:8000). Browser Client Components use NEXT_PUBLIC_API_BASE_URL
+// — routed to the host-accessible URL (e.g. http://localhost:8000).
+const BASE =
+  typeof window === "undefined"
+    ? (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000")
+    : (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000");
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

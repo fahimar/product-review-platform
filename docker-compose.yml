@@ -25,10 +25,29 @@ services:
       DATABASE_URL: postgresql+asyncpg://reviewdibo:reviewdibo@db:5432/reviewdibo
       JWT_SECRET: change-me-in-production
       JWT_EXPIRE_MINUTES: "30"
-      CORS_ORIGINS: '["http://localhost:3000"]'
+      CORS_ORIGINS: '["http://localhost:3000","http://localhost:3001"]'
+      # Required so `uv run python scripts/seed.py` can import from app.*
+      PYTHONPATH: /app
     depends_on:
       db:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the client JS bundle at build time — must be reachable by
+        # the browser, not the container.
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3001:3000"
+    environment:
+      # Runtime env for Server Components / SSR — routes inside Docker network.
+      API_BASE_URL: http://backend:8000
+      # Client-side fallback (already baked in at build, but set for clarity).
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    depends_on:
+      - backend
 
 volumes:
   pgdata:
