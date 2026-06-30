@@ -1,6 +1,5 @@
-from typing import Any
+import json
 
-from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,14 +10,14 @@ class Settings(BaseSettings):
     JWT_SECRET: str
     JWT_EXPIRE_MINUTES: int = 30
     ALGORITHM: str = "HS256"  # internal — callers use JWT_SECRET/JWT_EXPIRE_MINUTES
-    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: str = "http://localhost:3000"
 
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v: Any) -> Any:
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
+    @property
+    def cors_origins_list(self) -> list[str]:
+        raw = self.CORS_ORIGINS.strip()
+        if raw.startswith("["):
+            return json.loads(raw)
+        return [o.strip() for o in raw.split(",") if o.strip()]
 
 
 settings = Settings()  # type: ignore[call-arg]
